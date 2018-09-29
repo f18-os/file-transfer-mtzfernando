@@ -132,7 +132,7 @@ class Conn:
         connections.remove(self)
     def doErr(self):
         print("forwarder from client %s failing due to error" % repr(self.caddr))
-        die()
+        self.die()
                 
 class Listener:
     def __init__(self, bindaddr, saddr, addrFamily=AF_INET, socktype=SOCK_STREAM): # saddr is address of server
@@ -195,6 +195,3 @@ while 1:
         wmap[sock].doSend()
     for sock in xset:
         xmap[sock].doErr()
-
-    
-
