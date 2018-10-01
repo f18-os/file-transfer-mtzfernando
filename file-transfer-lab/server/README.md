@@ -10,6 +10,6 @@ the request and goes back to waiting for a new request.
 python fileServer.py
 
 Options:
-* -l or --listenPort The port to listen on				default: 50001
-* -d or --debug To print debug statements in the code      default: False
-* -? or --usage Boolean to show how to run the program	default:False
+* -l or --listenPort The port to listen on				        `default: 50001`
+* -d or --debug      To print debug statements in the code      `default: False`
+* -? or --usage      Boolean to show how to run the program	    `default:False`
