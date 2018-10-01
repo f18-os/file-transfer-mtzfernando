@@ -8,7 +8,7 @@ import params
 
 
 switchesVarDefaults = (
-    (('-s', '--server'), 'server', "127.0.0.1:50000"),
+    (('-s', '--server'), 'server', "127.0.0.1:50001"),
     (('-d', '--debug'), "debug", False), # boolean (set if present)
     (('-?', '--usage'), "usage", False), # boolean (set if present)
     (('-f', '--file'), "file", "constitution.txt")
