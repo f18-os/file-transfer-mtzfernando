@@ -39,6 +39,13 @@ for res in socket.getaddrinfo(serverHost, serverPort, socket.AF_UNSPEC, socket.S
         print(" error: %s" % msg)
         s = None
         continue
+    try:                                                    # Try to open the file to put on server
+        file = open(file_name, 'r')
+        if debug: print("OPENED FILE")
+        data = file.read(100)                               # Read the first 100 bytes from the file.
+    except IOError:
+        print("File does not exists or unable to open. Shutting down!")       # Shutdown if unable to open file.
+        sys.exit(0)
     try:
         print(" attempting to connect to %s" % repr(sa))
         s.connect(sa)
@@ -53,16 +60,13 @@ if s is None:
     print('could not open socket')
     sys.exit(1)
 
-framedSend(s, file_name.encode(), debug)
-response = framedReceive(s, debug)
-if response.decode() == "File exists":
+framedSend(s, file_name.encode(), debug)                    # Send the request for the file.
+response = framedReceive(s, debug)                          # Wait for the response from the server.
+if response.decode() == "File exists":                      # If file already on the server shutdown.
     print("The file is already in the server. Closing the socket")
     s.close()
 else:
-    with open(file_name, 'r') as file:
-        if debug: print("OPENED FILE")
+    while data:                                             # Finish sending the rest of the file 100 bytes at the time.
+        framedSend(s, data.encode(), debug)
         data = file.read(100)
-        while data:
-            framedSend(s, data.encode(), debug)
-            data = file.read(100)
-        s.shutdown(socket.SHUT_WR)
+    s.shutdown(socket.SHUT_WR)                              # Shutdown the socket.

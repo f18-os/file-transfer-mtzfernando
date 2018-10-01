@@ -15,7 +15,7 @@ def framedReceive(sock, debug=0):
     msgLength = -1
     while True:
          if (state == "getLength"):
-             match = re.match(b'([^:]+):([\s\S]*)', rbuf) # look for colon
+             match = re.match(b'([^:]+):([\s\S]*)', rbuf)       # look for colon. Changed the matching pattern after the colon.
              if match:
                   lengthStr, rbuf = match.groups()
                   try:

@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 
-import sys, re, socket, os
+import os
+import socket
+import sys
+
 sys.path.append("../../lib")       # for params
 import params
 from framedSock import framedReceive, framedSend
@@ -26,35 +29,35 @@ lsock.listen(5)
 print("listening on:", bindAddr)
 
 while 1:
-    sock, addr = lsock.accept()
+    sock, addr = lsock.accept()                             # Wait for a connection.
     print("connection rec'd from", addr)
-    rc = os.fork()
-    if rc < 0:
+    print("Child will take care of the request")
+    rc = os.fork()                                          # Once a connection is made fork of a child to take care of the request.
+    if rc < 0:                                              # If unable to fork wait for another connection.
         print("Failed to fork")
         continue
-    elif rc == 0:
-        payload = framedReceive(sock, debug)
+    elif rc == 0:                                           # Child
+        payload = framedReceive(sock, debug)                # Receive the request.
         if debug: print("rec'd: ", payload)
-        if os.path.exists(payload):
+        if os.path.exists(payload):                         # Check if the file is in the server already.
             if debug: print("FILE ALREADY EXISTS")
-            framedSend(sock, b"File exists")
-            sock.shutdown(socket.SHUT_RDWR)
-            sys.exit(0)
+            framedSend(sock, b"File exists")                # Send the file exists.
+            sock.shutdown(socket.SHUT_RDWR)                 # Shutdown the socket.
+            sys.exit(0)                                     # Kill the child.
         else:
-            framedSend(sock, b"Ready")
-            with open(payload, 'w') as file:
+            framedSend(sock, b"Ready")                      # Send the file is ready to receive the file.
+            with open(payload, 'w') as file:                # Open file to receive
                 if debug: print("OPENED FILE")
                 while True:
-                    payload = framedReceive(sock, debug)
+                    payload = framedReceive(sock, debug)    # Receive the file.
                     if debug: print("RECEIVED PAYLOAD: %s" % payload)
-                    if not payload:
+                    if not payload:                         # Check if done receiving file.
                         if debug: print("DONE WRITING INSIDE NOT PAYLOAD")
-                        sock.shutdown(socket.SHUT_RDWR)
+                        sock.shutdown(socket.SHUT_RDWR)     # Shutdown the socket
                         if debug: print("CLOSED THE SOCKET")
-                        sys.exit(0)
+                        sys.exit(0)                         # Kill the child
                     else:
-                        file.write(payload.decode())
+                        file.write(payload.decode())        # Write the data to the file.
                         if debug: print("WROTE THE PAYLOAD TO FILE")
-    else:
+    else:                                                   # Parent
         print("listening on:", bindAddr)
-        # sock.close()
